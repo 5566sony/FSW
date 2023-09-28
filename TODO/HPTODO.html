@@ -1,0 +1,116 @@
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Todo List</title>
+  <link rel="stylesheet" href="TODO.css">
+</head>
+<body>
+  <div class="container">
+    <h2>Todo List</h2>
+    <form id="todo-form">
+      <input type="text" id="todo-input" placeholder="Enter your task...">
+      <input type="date" id="todo-date" required>
+  <input type="time" id="todo-time" required>
+<button type="submit">Add Task</button>
+      
+    </form>
+    <ul id="todo-list">
+      <!-- Todo items will be dynamically added here -->
+    </ul>
+    <div class="reminder-container">
+      <label for="reminder-input">Set Reminder (in seconds):</label>
+      <input type="number" id="reminder-input" min="1" step="1" placeholder="Enter reminder duration...">
+      <button id="set-reminder-button">Set Reminder</button>
+    </div>
+  </div>
+  <script >
+const todoForm = document.getElementById('todo-form');
+const todoInput = document.getElementById('todo-input');
+const todoDateInput = document.getElementById('todo-date');
+const todoTimeInput = document.getElementById('todo-time');
+const todoList = document.getElementById('todo-list');
+const reminderInput = document.getElementById('reminder-input');
+const setReminderButton = document.getElementById('set-reminder-button');
+let reminderTimeout;
+
+todoForm.addEventListener('submit', function (event) {
+  event.preventDefault();
+  const taskText = todoInput.value.trim();
+  const taskDate = todoDateInput.value;
+  const taskTime = todoTimeInput.value;
+  if (taskText !== '') {
+    addTaskToList(taskText);
+    todoInput.value = '';
+    todoDateInput.value = '';
+    todoTimeInput.value = '';
+} else {
+    alert('Please fill in all the fields to add a task.');
+  }
+});
+
+setReminderButton.addEventListener('click', function () {
+  const duration = parseFloat(reminderInput.value);
+  if (isNaN(duration) || duration <= 0) {
+    alert('Please enter a valid numeric value greater than 0 for the reminder duration.');
+    return;
+  }
+
+  const taskText = todoInput.value.trim();
+  if (taskText === '') {
+    alert('Please enter a task before setting a reminder.');
+
+
+    return;
+  }
+const taskDate = todoDateInput.value;
+  const taskTime = todoTimeInput.value;
+  if (taskDate === '' || taskTime === '') {
+    alert('Please select both date and time for the task before setting a reminder.');
+    return;
+  }
+
+  const taskTimestamp = new Date(`${taskDate} ${taskTime}`).getTime();
+  const currentTime = new Date().getTime();
+  const durationToTask = taskTimestamp - currentTime;
+
+  if (durationToTask <= 0) {
+    alert('Please select a future date and time for the task.');
+    return;
+  }
+
+  setReminder(taskText, duration);
+  reminderInput.value = '';
+});
+
+function addTaskToList(taskText) {
+  const li = document.createElement('li');
+  li.innerHTML = `
+    <span>${taskText}</span>
+    <button class="delete-button">Delete</button>
+  `;
+  todoList.appendChild(li);
+  const deleteButton = li.querySelector('.delete-button');
+  deleteButton.addEventListener('click', function () {
+    todoList.removeChild(li);
+  });
+}
+function setReminder(taskText, duration) {
+  if (reminderTimeout) {
+    clearTimeout(reminderTimeout);
+  }
+
+  reminderTimeout = setTimeout(function () {
+    alert(`Reminder: You have tasks "${taskText}" to do!`);
+  }, duration * 1000); // Convert to milliseconds
+}  
+
+
+</script>
+</body>
+</html>
+
